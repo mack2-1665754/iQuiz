@@ -28,10 +28,12 @@ extension View {
 struct ContentView: View {
     @State private var orientation = UIDeviceOrientation.unknown
     @State private var showingAlert = false
-    @EnvironmentObject var jokeItemStorage: JokeItemStorage
+    @EnvironmentObject var quizItemStorage: QuizItemStorage
     var body: some View {
         NavigationView {
             VStack(alignment: .trailing) {
+
+                
                 Button("Settings") {
                     showingAlert = true
                 }
@@ -39,40 +41,18 @@ struct ContentView: View {
                     Alert(title: Text("Settings"), message: Text("Settings go here"), dismissButton: .default(Text("Ok")))
                 }
                 List {
-                    HStack {
-                        NavigationLink(destination: QuestionView()) {
-                            HStack{
-                                Image(systemName: "plus")
-                                VStack(alignment: .leading){
-                                    Text("Mathematics")
-                                    Text("This section contains basic math problems").font(.subheadline).fontWeight(.light)
+                        ForEach(self.quizItemStorage.quizzes) { quizItem in
+                            NavigationLink(destination: QuestionView(questions: quizItem.questions)) {
+                                HStack{
+                                    Image(systemName: "plus")
+                                    VStack(alignment: .leading){
+                                        Text(quizItem.topic)
+                                        Text(quizItem.description).font(.subheadline).fontWeight(.light)
+                                    }
                                 }
                             }
                         }
-                    }
-                    HStack {
-                        NavigationLink(destination: QuestionView()) {
-                            HStack{
-                                Image(systemName: "plus")
-                                VStack(alignment: .leading){
-                                    Text("Marvel Superheroes")
-                                    Text("This section tests your marvel knowledge").font(.subheadline).fontWeight(.light)
-                                }
-                            }
-                        }
-                    }
-                    HStack {
-                        NavigationLink(destination: QuestionView()) {
-                            HStack{
-                                Image(systemName: "plus")
-                                VStack(alignment: .leading){
-                                    Text("Science")
-                                    Text("This section contains basic science problems").font(.subheadline).fontWeight(.light)
-                                }
-                            }
-                        }
-                    }
-
+                    
                 }
             }
         }.frame(width: UIScreen.main.bounds.width-20, alignment: .center).onRotate { newOrientation in
@@ -84,6 +64,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView().environmentObject(JokeItemStorage())
+        ContentView().environmentObject(QuizItemStorage())
     }
 }
