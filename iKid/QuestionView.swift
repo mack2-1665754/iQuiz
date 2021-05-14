@@ -9,27 +9,49 @@ import SwiftUI
 
 struct QuestionView: View {
     var questions = [questionItem]()
-    @State var selectedQuestion = UUID()
+    @State var selectedAnswer = UUID()
+    @State var answerIsCorrect = true
     @State var numCorrect = 0
     @State var currentQuestion = 0
+    @State var submitted = false
+    
     init(questions: [questionItem]) {
         self.questions = questions
     }
     
+    var drag : some Gesture {
+        DragGesture().onEnded {_ in
+                if (self.currentQuestion < questions.count) {
+                    self.currentQuestion += 1
+                    self.answerIsCorrect = true
+                }
+            }
+    }
+    
+    func checkAnswer() {
+        let questionAnswers = questions[self.currentQuestion].answers
+        for i in 0...questionAnswers.count - 1 {
+            if (questionAnswers[i].id == self.selectedAnswer) {
+                if (questionAnswers[i].isCorrect) {
+                    self.numCorrect += 1
+                    self.answerIsCorrect = true
+                } else {
+                    self.answerIsCorrect = false
+                }
+            }
+        }
+    }
     
     var body: some View {
         if (self.currentQuestion < questions.count) {
             VStack {
                 Text("Question number " + String(self.currentQuestion + 1) + " out of " + String(questions.count))
-                Text(self.questions[self.currentQuestion].questionString).font(.largeTitle).padding()
+                Text(self.questions[self.currentQuestion].questionString).padding()
                 ForEach(self.questions[self.currentQuestion].answers) { answer in
                     Button(action: {
-                        //change color
-                        //update the selected correct question (so a user can change their answer)
-                        self.selectedQuestion = answer.id
+                        self.selectedAnswer = answer.id
                     }) {
-                        // if answer.id = self.selectedQuestion
-                        if (answer.id == self.selectedQuestion){
+                        if (answer.id == self.selectedAnswer){
                             Text(answer.answerString).padding()
                                 .foregroundColor(.white)
                                 .background(Rectangle().cornerRadius(25).frame(width: 200, height: 50).foregroundColor(.green))
@@ -40,26 +62,21 @@ struct QuestionView: View {
                         }
                     }
                 }
+                
                 Button(action: {
-                    let questionAnswers = questions[self.currentQuestion].answers
-                    for i in 0...questionAnswers.count - 1 {
-                        if (questionAnswers[i].id == self.selectedQuestion) {
-                            if (questionAnswers[i].isCorrect) {
-                                self.numCorrect += 1
-                            }
-                        }
-                    }
-                    
-                    if (self.currentQuestion < questions.count) {
-                        self.currentQuestion += 1
-                    }
+                    checkAnswer()
                 }) {
                     Text("Submit Answer").padding()
                         .foregroundColor(.white)
-                        .background(Rectangle().cornerRadius(25)).padding()
-                        
-                    
+                        .background(Rectangle().cornerRadius(25).frame(width: 150, height: 50).padding())
+
                 }
+                
+                if (!self.answerIsCorrect) {
+                    Text("wrong answer")
+                }
+//
+                Text("Swipe here for next question").padding().gesture(drag)
             }
         } else {
             let score = Double(self.numCorrect) / Double(self.questions.count)
