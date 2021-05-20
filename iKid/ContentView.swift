@@ -29,6 +29,13 @@ struct ContentView: View {
     @State private var orientation = UIDeviceOrientation.unknown
     @State private var showingAlert = false
     @EnvironmentObject var quizItemStorage: QuizItemStorage
+    @State var quizURL = "https://tednewardsandbox.site44.com/questions.json"
+    @State var answer: String = ""
+    @State var quizzes: [QuizObject] = []
+    @State var showError = false
+    @State var loadError = ""
+    @EnvironmentObject var quizItemStorage: QuizItemStorage
+    
     var body: some View {
         NavigationView {
             VStack(alignment: .trailing) {
