@@ -15,29 +15,17 @@ struct ContentView: View {
     @State var answer: String = ""
     @State var quizzes: [QuizObject] = []
     @State var showError = false
-    @State var loadError = ""
+    @State var fetchError = ""
     @EnvironmentObject var quizItemStorage: QuizItemStorage
     @State private var orientation = UIDeviceOrientation.unknown
     @State private var showingAlert = false
-//    @State var quizURL = "https://tednewardsandbox.site44.com/questions.json"
-//    @State var answer: String = ""
-//    @State var quizzes: [QuizObject] = []
-//    @State var showError = false
-//    @State var loadError = ""
-//    @EnvironmentObject var quizItemStorage: QuizItemStorage
+
     
 
     
     var body: some View {
         NavigationView {
             VStack(alignment: .trailing) {
-
-                Button("Settings") {
-                    showingAlert = true
-                }
-                .alert(isPresented: $showingAlert) {
-                    Alert(title: Text("Settings"), message: Text("Settings go here"), dismissButton: .default(Text("Ok")))
-                }
                 List {
                         ForEach(self.quizzes) { quiz in
                             NavigationLink(destination: QuestionView(questions: quiz.questions)) {
@@ -50,7 +38,24 @@ struct ContentView: View {
                                 }
                             }
                         }
-                    
+                }
+            }.navigationTitle("iQuiz")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button("settings") {
+                        self.showingAlert = !self.showingAlert
+                    }
+                }
+            }.popover(isPresented: $showingAlert) {
+                VStack {
+                    Text("URL to fetch quiz questions from:").padding()
+                    TextField("Enter URL here:", text: $quizURL).padding()
+                    Button("Check now") {
+                        loadData()
+                        self.showingAlert = false
+                    }.padding()
+                    .foregroundColor(.white).frame(width: 200, height: 50)
+                    .background(Rectangle().cornerRadius(25).foregroundColor(.green))
                 }
             }
         }.onAppear {
@@ -137,67 +142,23 @@ extension ContentView {
 //                        print(String(quizzes[0].title))
                     }
                 } catch DecodingError.keyNotFound(let key, let context) {
-                    self.loadError = "could not find key \(key) in JSON: \(context.debugDescription)"
-                    print(self.loadError)
+                    self.fetchError = "could not find key \(key): \(context.debugDescription)"
+                    print(self.fetchError)
                 } catch DecodingError.valueNotFound(let type, let context) {
-                    self.loadError = "could not find type \(type) in JSON: \(context.debugDescription)"
-                    print(self.loadError)
-                } catch DecodingError.typeMismatch(let type, let context) {
-                    self.loadError = "type mismatch for type \(type) in JSON: \(context.debugDescription)"
-                    print(self.loadError)
+                    self.fetchError = "could not find type \(type): \(context.debugDescription)"
+                    print(self.fetchError)
                 } catch DecodingError.dataCorrupted(let context) {
-                    self.loadError = "data found to be corrupted in JSON: \(context.debugDescription)"
-                    print(self.loadError)
+                    self.fetchError = "data corrupted: \(context.debugDescription)"
+                    print(self.fetchError)
+                } catch DecodingError.typeMismatch(let type, let context) {
+                    self.fetchError = "type mismatch for type \(type) \(context.debugDescription)"
+                    print(self.fetchError)
                 } catch let error as NSError {
-                    self.loadError = "Error in read(from:ofType:) domain= \(error.domain), description= \(error.localizedDescription)"
-                    print(self.loadError)
+                    self.fetchError = "\(error.localizedDescription)"
+                    print(self.fetchError)
                 }
             }
         }.resume()
     }
 }
 
-//struct ContentView: View {
-//    @State private var orientation = UIDeviceOrientation.unknown
-//    @State private var showingAlert = false
-//    @State var quizURL = "https://tednewardsandbox.site44.com/questions.json"
-//    @State var answer: String = ""
-//    @State var quizzes: [QuizObject] = []
-//    @State var showError = false
-//    @State var loadError = ""
-//    @EnvironmentObject var quizItemStorage: QuizItemStorage
-//    
-//
-//    
-//    var body: some View {
-//        NavigationView {
-//            VStack(alignment: .trailing) {
-//
-//                
-//                Button("Settings") {
-//                    showingAlert = true
-//                }
-//                .alert(isPresented: $showingAlert) {
-//                    Alert(title: Text("Settings"), message: Text("Settings go here"), dismissButton: .default(Text("Ok")))
-//                }
-//                List {
-//                        ForEach(self.quizItemStorage.quizzes) { quizItem in
-//                            NavigationLink(destination: QuestionView(questions: quizItem.questions)) {
-//                                HStack{
-//                                    Image(systemName: "plus")
-//                                    VStack(alignment: .leading){
-//                                        Text(quizItem.topic)
-//                                        Text(quizItem.description).font(.subheadline).fontWeight(.light)
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    
-//                }
-//            }
-//        }.frame(width: UIScreen.main.bounds.width-20, alignment: .center).onRotate { newOrientation in
-//            orientation = newOrientation
-//        }
-//    }
-//    
-//}
