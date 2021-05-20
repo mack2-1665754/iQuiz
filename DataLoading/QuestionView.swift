@@ -65,15 +65,16 @@ struct QuestionView: View {
                         if (answer == self.selectedAnswer){
                             Text(answer).padding()
                                 .foregroundColor(.white)
-                                .background(Rectangle().cornerRadius(25).frame(width: 200, height: 50).foregroundColor(.green))
+                                .background(Rectangle().cornerRadius(25).foregroundColor(.green))
                         } else {
                             Text(answer).padding()
-                                .foregroundColor(.white).frame(width: 200, height: 50)
+                                .foregroundColor(.white)
                                 .background(Rectangle().cornerRadius(25))
                         }
                     }
                 }
                 
+                Spacer()
                 Button(action: {
                     checkAnswer()
                     
