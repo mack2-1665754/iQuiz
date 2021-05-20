@@ -60,7 +60,7 @@ struct ContentView: View {
                         }
                 }
             }.alert(isPresented: $showError) {
-                Alert(title: Text("Error"), message: Text(self.fetchError), dismissButton: .default(Text("Ok")))
+                Alert(title: Text("Error"), message: Text("Error fetching data at that location, using default quiz data"), dismissButton: .default(Text("Ok")))
             }
             .navigationTitle("iQuiz")
             .toolbar {
@@ -120,10 +120,8 @@ extension ContentView {
         let request = URLRequest(url: url)
         
         URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                do {
+            if (error != nil) {
                     self.showError = true
-                }
             }
             if let data = data {
                 do {
